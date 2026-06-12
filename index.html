@@ -142,7 +142,10 @@ svg.chart{width:100%;height:150px;display:block}
 <div class="modal" id="whoModal">
   <div class="inner">
     <h2>👋 Ciao! Chi sei?</h2>
-    <div class="fixed">Scegli il tuo profilo: ognuno ha i propri pasti, peso e progressi, sincronizzati su tutti i dispositivi. Potrai cambiare profilo in qualsiasi momento dalla barra in alto.</div>
+    <div class="fixed">Inserisci il <b>codice famiglia</b> e scegli il tuo profilo. Ognuno ha i propri pasti, peso e progressi, sincronizzati su tutti i dispositivi. Potrai cambiare profilo quando vuoi dalla barra in alto.</div>
+    <input id="whoCode" type="password" inputmode="numeric" autocomplete="off" placeholder="Codice famiglia" style="width:100%;margin-top:12px;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:16px;letter-spacing:.2em;text-align:center">
+    <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--txt2);cursor:pointer"><input type="checkbox" id="whoRemember" checked style="width:18px;height:18px;accent-color:var(--acc2)">Ricorda il codice su questo dispositivo</label>
+    <div class="fixed" id="whoErr" style="color:var(--bad);display:none;font-weight:700"></div>
     <button class="whoBtn" id="whoGio">🧔 Giò</button>
     <button class="whoBtn" id="whoElena">👩 Elena</button>
   </div>
@@ -223,7 +226,7 @@ const firebaseConfig={
  messagingSenderId:"348912419577",
  appId:"1:348912419577:web:242b0caf162a0d382f1828"
 };
-const ROOT='pianoGioElena2026';
+const dataPath=()=>'piano_'+(U.secret||'');
 let DB=null;
 try{
  if(typeof firebase!=='undefined'){firebase.initializeApp(firebaseConfig);DB=firebase.database();}
@@ -236,8 +239,8 @@ function lsGet(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
 // preferenze locali del dispositivo (non sincronizzate)
-let U=lsGet('pianoUX')||{theme:'dark',view:'oggi',weekOff:0,profile:null};
-function saveU(){lsSet('pianoUX',U)}
+let U=lsGet('pianoUX')||{theme:'dark',view:'oggi',weekOff:0,profile:null,secret:null};
+function saveU(){const c=Object.assign({},U);if(!c.rememberCode)delete c.secret;lsSet('pianoUX',c)}
 
 function normalize(s){
  if(!s||typeof s!=='object')s=EMPTY_DATA();
@@ -283,9 +286,9 @@ function save(){
  }
 }
 function attach(){
- if(!DB)return;
+ if(!DB||!U.secret)return;
  if(fbRef)fbRef.off();
- fbRef=DB.ref(ROOT+'/'+U.profile);
+ fbRef=DB.ref(dataPath()+'/'+U.profile);
  fbRef.on('value',snap=>{
   const val=snap.val();
   if(val===null){ // primo avvio di questo profilo sul cloud: carica i dati locali
@@ -333,10 +336,22 @@ themeBtn.textContent=U.theme==='dark'?'🌙':'☀️';
 themeBtn.onclick=()=>{U.theme=U.theme==='dark'?'light':'dark';document.body.dataset.theme=U.theme;themeBtn.textContent=U.theme==='dark'?'🌙':'☀️';saveU()};
 document.getElementById('infoBtn').onclick=()=>document.getElementById('planModal').classList.add('on');
 document.getElementById('planClose').onclick=()=>document.getElementById('planModal').classList.remove('on');
-document.getElementById('pGio').onclick=()=>setProfile('gio');
-document.getElementById('pElena').onclick=()=>setProfile('elena');
-document.getElementById('whoGio').onclick=()=>setProfile('gio');
-document.getElementById('whoElena').onclick=()=>setProfile('elena');
+function joinAs(p){
+ const err=document.getElementById('whoErr');
+ const code=U.secret||document.getElementById('whoCode').value.trim();
+ if(!code){err.textContent='Inserisci il codice famiglia';err.style.display='block';return}
+ const remEl=document.getElementById('whoRemember');
+ const rem=remEl?remEl.checked:true;
+ if(!DB){U.secret=code;U.rememberCode=rem;saveU();setProfile(p);return}
+ err.style.display='none';
+ DB.ref('piano_'+code+'/_check').once('value')
+  .then(()=>{U.secret=code;U.rememberCode=rem;saveU();setProfile(p)})
+  .catch(()=>{err.textContent='Codice errato, riprova.';err.style.display='block'});
+}
+document.getElementById('pGio').onclick=()=>{if(U.secret)setProfile('gio')};
+document.getElementById('pElena').onclick=()=>{if(U.secret)setProfile('elena')};
+document.getElementById('whoGio').onclick=()=>joinAs('gio');
+document.getElementById('whoElena').onclick=()=>joinAs('elena');
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
@@ -615,7 +630,7 @@ document.querySelectorAll('nav button').forEach(b=>{
  const on=b.dataset.v===(U.view||'oggi');b.classList.toggle('on',on);
  document.getElementById('v-'+b.dataset.v).classList.toggle('on',on);
 });
-if(U.profile){setProfile(U.profile)}
+if(U.profile&&U.secret){setProfile(U.profile)}
 else{document.getElementById('whoModal').classList.add('on')}
 </script>
 </body>
