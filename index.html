@@ -664,7 +664,17 @@ function renderProg(){
  h+=sg.length?sg.map(ds=>`<div class="wrow"><span class="d cap">${fmtDate(ds)}</span><span>🍕</span></div>`).join(''):'<div class="fixed">Nessuno sgarro registrato. Grande! 💪</div>';
  h+='</div>';
 
+ h+=`<button class="btn ghost" id="logout">🔑 Cambia codice famiglia</button>`;
+
  v.innerHTML=h;
+ v.querySelector('#logout').onclick=()=>{
+  if(!confirm('Uscire da questo dispositivo e reinserire il codice famiglia?\n\nI dati restano salvati: li ritrovi appena rientri.'))return;
+  if(fbRef){fbRef.off();fbRef=null}
+  U.secret=null;U.rememberCode=false;saveU();
+  const err=document.getElementById('whoErr');if(err)err.style.display='none';
+  const code=document.getElementById('whoCode');if(code)code.value='';
+  document.getElementById('whoModal').classList.add('on');
+ };
  v.querySelector('#wadd').onclick=()=>{
   const kg=parseFloat(v.querySelector('#wkg').value);if(!kg||kg<30||kg>250)return;
   const t=today();const ex=S.weights.find(w=>w.d===t);
