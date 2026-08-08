@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0f1218">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://script.google.com https://script.googleusercontent.com; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Piano Alimentare</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='16' y='26' font-size='26' text-anchor='middle'%3E%F0%9F%A5%97%3C/text%3E%3C/svg%3E">
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -408,7 +408,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')setPlan(false)});
 /* ---- Tentativi falliti: attesa crescente + avviso via mail ----
    Vive su questo dispositivo (localStorage). Ferma chi prova a indovinare dalla
    schermata dell'app; NON puo fermare chi parla direttamente col database. */
-const ALERT_URL=''; // endpoint per l'avviso: vuoto = nessuna mail
+// Google Apps Script sul mio account: manda la mail e limita a un avviso all'ora lato server
+const ALERT_URL='https://script.google.com/macros/s/AKfycbzhLPP9FSFtzBl8e69cyIbCIoSmFYHDEogQJWXENDhY9tt7tIXtRmkwMlqOb_tVeouywg/exec';
 const ALERT_SOGLIA=10, ALERT_PAUSA=3600e3; // max un avviso all'ora
 function failGet(){const f=lsGet('pianoFails');return (f&&typeof f==='object')?f:{n:0,until:0,mail:0}}
 function failSet(f){lsSet('pianoFails',f)}
@@ -429,7 +430,8 @@ function avvisaMail(n){
  const f=failGet();
  if(!ALERT_URL||n<ALERT_SOGLIA||Date.now()-f.mail<ALERT_PAUSA)return;
  f.mail=Date.now();failSet(f);
- fetch(ALERT_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+ // text/plain: evita la preflight OPTIONS, che Apps Script non gestisce
+ fetch(ALERT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
   body:JSON.stringify({tentativi:n,quando:new Date().toISOString(),dispositivo:navigator.userAgent})}).catch(()=>{});
 }
 function joinAs(p){
