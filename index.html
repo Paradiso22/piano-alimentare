@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#10131a">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com; base-uri 'none'; form-action 'none'">
 <title>Piano Alimentare</title>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
@@ -319,6 +320,8 @@ function updateProfUI(){
 }
 
 /* ============ HELPERS ============ */
+const ESCMAP={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>ESCMAP[c])}
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function today(){return iso(new Date())}
 function monday(off){off=off||0;const d=new Date();const wd=(d.getDay()+6)%7;d.setDate(d.getDate()-wd+off*7);return d}
@@ -372,7 +375,7 @@ function countsHtml(dates){
 }
 
 /* ============ VIEW: OGGI ============ */
-function chips(list,sel){return '<div class="chips">'+list.map(o=>`<button class="chip ${sel===o.id?'on':''}" data-id="${o.id}">${o.l}</button>`).join('')+'</div>'}
+function chips(list,sel){return '<div class="chips">'+list.map(o=>`<button class="chip ${sel===o.id?'on':''}" data-id="${esc(o.id)}">${esc(o.l)}</button>`).join('')+'</div>'}
 
 function renderOggi(){
  const ds=today(),d=day(ds),wd=dow(ds);
@@ -433,7 +436,7 @@ function customCardHtml(){
  let h=`<div class="card"><div class="mealhead" style="margin-bottom:4px"><h3><span class="em">➕</span>Alimenti personalizzati</h3></div>
  <div class="fixed">Nome + grammi + pasto + reparto: l'alimento comparirà tra le scelte di Oggi e Settimana e nella lista spesa.</div>`;
  const allC=[];Object.keys(SLOTS).forEach(k=>(S.custom[k]||[]).forEach(c=>allC.push([k,c])));
- allC.forEach(([k,c])=>{h+=`<div class="shopitem"><label>${c.l}${c.g?' '+c.g+'g':''}</label><span class="q">${SLOTS[k]}</span><button class="del" data-cdel="${k}|${c.id}">✕</button></div>`});
+ allC.forEach(([k,c])=>{h+=`<div class="shopitem"><label>${esc(c.l)}${c.g?' '+esc(c.g)+'g':''}</label><span class="q">${SLOTS[k]}</span><button class="del" data-cdel="${esc(k+'|'+c.id)}">✕</button></div>`});
  h+=`<div class="lbl">Nuovo alimento</div><div class="selgrid">
   <input class="cName full" placeholder="Nome (es. seitan, ricotta, couscous…)" style="padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:13px">
   <input class="cG" type="number" inputmode="numeric" placeholder="Grammi" style="padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:13px">
@@ -467,11 +470,11 @@ function renderSett(){
  h+='<div class="card">';
  dates.forEach((ds,i)=>{
   const d=day(ds),sat=i===5,sun_=i===6,isToday=ds===today();
-  const sel=(list,val,k1,k2)=>`<select data-ds="${ds}" data-k="${k1}.${k2}"><option value="">— ${k2==='c'?'carboidrato':k2==='p'?'proteina':k2==='f'?'proteina colazione':'grassi'} —</option>${list.map(o=>`<option value="${o.id}" ${val===o.id?'selected':''}>${o.l}</option>`).join('')}</select>`;
+  const sel=(list,val,k1,k2)=>`<select data-ds="${ds}" data-k="${k1}.${k2}"><option value="">— ${k2==='c'?'carboidrato':k2==='p'?'proteina':k2==='f'?'proteina colazione':'grassi'} —</option>${list.map(o=>`<option value="${esc(o.id)}" ${val===o.id?'selected':''}>${esc(o.l)}</option>`).join('')}</select>`;
   const sum=[];
-  if(d.pr.p&&!sun_)sum.push('P: '+lbl(opts('prP'),d.pr.p).split(' ')[0]);
+  if(d.pr.p&&!sun_)sum.push('P: '+esc(lbl(opts('prP'),d.pr.p).split(' ')[0]));
   if(sun_)sum.push('P: libero 🎉');
-  if(sat)sum.push('C: pizza 🍕');else if(d.ce.p)sum.push('C: '+lbl(opts('ceP'),d.ce.p).split(' ')[0]);
+  if(sat)sum.push('C: pizza 🍕');else if(d.ce.p)sum.push('C: '+esc(lbl(opts('ceP'),d.ce.p).split(' ')[0]));
   if(d.workout)sum.push('🏋️');
   if(d.sgarro)sum.push('😅 sgarro');
   h+=`<div class="dayrow ${openDay===ds?'open':''}" data-day="${ds}">
@@ -481,7 +484,7 @@ function renderSett(){
     ${sun_?'<div class="lbl">Pranzo</div><div class="fixed">🎉 Libero con moderazione</div>':`<div class="lbl">Pranzo</div><div class="selgrid">${sel(opts('prC'),d.pr.c,'pr','c')}${sel(opts('prP'),d.pr.p,'pr','p')}</div>`}
     ${sat?'<div class="lbl">Cena</div><div class="fixed">🍕 Pizza o libero</div>':`<div class="lbl">Cena</div><div class="selgrid">${sel(opts('ceC'),d.ce.c,'ce','c')}${sel(opts('ceP'),d.ce.p,'ce','p')}</div>`}
     <div class="minirow"><span>🏋️ Allenamento</span><label class="switch"><input type="checkbox" data-wk="${ds}" ${d.workout?'checked':''}><span class="slider"></span></label></div>
-    ${d.workout?`<div class="lbl">Merenda pre-workout</div><div class="selgrid"><select class="full" data-ds="${ds}" data-k="me"><option value="">— scegli —</option>${opts('mePre').map(o=>`<option value="${o.id}" ${d.me===o.id?'selected':''}>${o.l}</option>`).join('')}</select></div>`:`<div class="fixed">Merenda: ${O.meNo.l}</div>`}
+    ${d.workout?`<div class="lbl">Merenda pre-workout</div><div class="selgrid"><select class="full" data-ds="${ds}" data-k="me"><option value="">— scegli —</option>${opts('mePre').map(o=>`<option value="${esc(o.id)}" ${d.me===o.id?'selected':''}>${esc(o.l)}</option>`).join('')}</select></div>`:`<div class="fixed">Merenda: ${O.meNo.l}</div>`}
    </div></div>`;
  });
  h+='</div>';
@@ -535,9 +538,9 @@ function renderSpesa(){
   if(!byCat[c])return;
   h+=`<div class="shopcat">${CAT[c]}</div>`;
   byCat[c].forEach(i=>{
-   const id='s_'+i.n.replace(/\W/g,'');
+   const id='s_'+Array.from(String(i.n)).map(c=>c.codePointAt(0)).join('-');
    const q=i.u==='pz'?i.q+' pz':i.u==='porz.'?i.q+' porz.':i.u==='ml'?i.q+' ml':i.q+' g';
-   h+=`<div class="shopitem ${ck[id]?'ck':''}"><input type="checkbox" id="${id}" data-ck="${id}" ${ck[id]?'checked':''}><label for="${id}">${i.n}</label><span class="q">${q}</span></div>`;
+   h+=`<div class="shopitem ${ck[id]?'ck':''}"><input type="checkbox" id="${id}" data-ck="${id}" ${ck[id]?'checked':''}><label for="${id}">${esc(i.n)}</label><span class="q">${esc(q)}</span></div>`;
   });
  });
  h+='</div>';
@@ -545,7 +548,7 @@ function renderSpesa(){
  h+='<div class="card"><div class="lbl" style="margin-top:0">Aggiunte manuali (non alimenti: caffè, acqua, casa…)</div>';
  if(!S.shopExtra.length)h+='<div class="fixed">Niente di extra. Aggiungi sotto 👇</div>';
  S.shopExtra.forEach((e,i)=>{
-  h+=`<div class="shopitem ${e.ck?'ck':''}"><input type="checkbox" data-ex="${i}" ${e.ck?'checked':''}><label>${e.n}</label><button class="del" data-del="${i}">✕</button></div>`;
+  h+=`<div class="shopitem ${e.ck?'ck':''}"><input type="checkbox" data-ex="${i}" ${e.ck?'checked':''}><label>${esc(e.n)}</label><button class="del" data-del="${i}">✕</button></div>`;
  });
  h+=`<div class="addrow"><input id="exName" placeholder="Es. caffè, acqua, detersivo…"><button id="exAdd">+</button></div></div>`;
  v.innerHTML=h;
@@ -580,11 +583,11 @@ function renderProg(){
   <div class="stat"><div class="v" style="color:${sgMese>5?'var(--bad)':'var(--txt)'}">${sgMese}</div><div class="k">Sgarri mese</div></div>
  </div>`;
 
- h+=`<div class="card"><div class="mealhead"><h3><span class="em">⚖️</span>Peso di ${PROFILES[U.profile]||''}</h3>${last?`<b>${last} kg${delta?` <span style="font-size:12px;color:${delta<=0?'var(--acc)':'var(--warn)'}">(${delta>0?'+':''}${delta})</span>`:''}</b>`:''}</div>`;
+ h+=`<div class="card"><div class="mealhead"><h3><span class="em">⚖️</span>Peso di ${PROFILES[U.profile]||''}</h3>${last?`<b>${esc(last)} kg${delta?` <span style="font-size:12px;color:${delta<=0?'var(--acc)':'var(--warn)'}">(${delta>0?'+':''}${esc(delta)})</span>`:''}</b>`:''}</div>`;
  if(ws.length>1)h+=chart(ws);
  h+=`<div class="addrow"><input id="wkg" type="number" inputmode="decimal" step="0.1" placeholder="Peso di oggi (kg)"><button id="wadd">+</button></div>`;
  if(ws.length){h+='<div style="margin-top:10px">';
-  [...ws].reverse().slice(0,8).forEach(w=>{h+=`<div class="wrow"><span class="d">${new Date(w.d+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</span><span><b>${w.kg} kg</b> <button class="del" data-wdel="${w.d}" style="background:none;border:none;color:var(--bad);cursor:pointer">✕</button></span></div>`});
+  [...ws].reverse().slice(0,8).forEach(w=>{h+=`<div class="wrow"><span class="d">${new Date(w.d+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</span><span><b>${esc(w.kg)} kg</b> <button class="del" data-wdel="${esc(w.d)}" style="background:none;border:none;color:var(--bad);cursor:pointer">✕</button></span></div>`});
   h+='</div>'}
  h+='</div>';
 
