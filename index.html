@@ -405,8 +405,37 @@ document.getElementById('infoBtn').onclick=()=>setPlan(true);
 document.getElementById('planClose').onclick=()=>setPlan(false);
 planModal.onclick=e=>{if(e.target===planModal)setPlan(false)}; // tocco fuori dal riquadro
 document.addEventListener('keydown',e=>{if(e.key==='Escape')setPlan(false)});
+/* ---- Tentativi falliti: attesa crescente + avviso via mail ----
+   Vive su questo dispositivo (localStorage). Ferma chi prova a indovinare dalla
+   schermata dell'app; NON puo fermare chi parla direttamente col database. */
+const ALERT_URL=''; // endpoint per l'avviso: vuoto = nessuna mail
+const ALERT_SOGLIA=10, ALERT_PAUSA=3600e3; // max un avviso all'ora
+function failGet(){const f=lsGet('pianoFails');return (f&&typeof f==='object')?f:{n:0,until:0,mail:0}}
+function failSet(f){lsSet('pianoFails',f)}
+function failAttesa(n){return n<3?0:Math.min(5*Math.pow(2,n-3),300)} // 5s,10s,20s… fino a 5 min
+let bloccoT=null;
+function mostraBlocco(){
+ const err=document.getElementById('whoErr'),f=failGet();
+ const resta=Math.ceil((f.until-Date.now())/1000);
+ const bottoni=[document.getElementById('whoGio'),document.getElementById('whoElena')];
+ clearTimeout(bloccoT);
+ if(resta<=0){bottoni.forEach(b=>{b.disabled=false;b.style.opacity=''});err.style.display='none';return}
+ bottoni.forEach(b=>{b.disabled=true;b.style.opacity='.45'});
+ err.textContent=`Troppi tentativi. Riprova tra ${resta} second${resta===1?'o':'i'}.`;
+ err.style.display='block';
+ bloccoT=setTimeout(mostraBlocco,1000);
+}
+function avvisaMail(n){
+ const f=failGet();
+ if(!ALERT_URL||n<ALERT_SOGLIA||Date.now()-f.mail<ALERT_PAUSA)return;
+ f.mail=Date.now();failSet(f);
+ fetch(ALERT_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({tentativi:n,quando:new Date().toISOString(),dispositivo:navigator.userAgent})}).catch(()=>{});
+}
 function joinAs(p){
  const err=document.getElementById('whoErr');
+ const f=failGet();
+ if(f.until>Date.now()){mostraBlocco();return}
  const code=U.secret||document.getElementById('whoCode').value.trim();
  if(!code){err.textContent='Inserisci il codice famiglia';err.style.display='block';return}
  const remEl=document.getElementById('whoRemember');
@@ -414,8 +443,14 @@ function joinAs(p){
  if(!DB){U.secret=code;U.rememberCode=rem;saveU();setProfile(p);return}
  err.style.display='none';
  DB.ref('piano_'+code+'/_check').once('value')
-  .then(()=>{U.secret=code;U.rememberCode=rem;saveU();setProfile(p)})
-  .catch(()=>{err.textContent='Codice errato, riprova.';err.style.display='block'});
+  .then(()=>{failSet({n:0,until:0,mail:f.mail});U.secret=code;U.rememberCode=rem;saveU();setProfile(p)})
+  .catch(()=>{
+   const n=f.n+1,att=failAttesa(n);
+   failSet({n:n,until:att?Date.now()+att*1000:0,mail:f.mail});
+   avvisaMail(n);
+   if(att)mostraBlocco();
+   else{err.textContent='Codice errato, riprova.';err.style.display='block'}
+  });
 }
 document.getElementById('pGio').onclick=()=>{if(U.secret)setProfile('gio')};
 document.getElementById('pElena').onclick=()=>{if(U.secret)setProfile('elena')};
@@ -723,7 +758,7 @@ document.querySelectorAll('nav button').forEach(b=>{
  document.getElementById('v-'+b.dataset.v).classList.toggle('on',on);
 });
 if(U.profile&&U.secret){setProfile(U.profile)}
-else{document.getElementById('whoModal').classList.add('on')}
+else{document.getElementById('whoModal').classList.add('on');mostraBlocco()} // il blocco sopravvive al riavvio
 
 // installabile su Android + funziona senza rete (fallisce in silenzio su file:// o browser vecchi)
 if('serviceWorker' in navigator&&window.isSecureContext){
