@@ -14,21 +14,30 @@
   --bg:#0f1218;--card:#1a1f2a;--card2:#232a38;--txt:#eef1f6;--txt2:#9aa4b5;
   --acc:#4ade80;--acc2:#22c55e;--warn:#fbbf24;--bad:#f87171;--line:#2c3445;
   --chip:#2a3242;--chipon:#14532d;--chipontxt:#86efac;--shadow:rgba(0,0,0,.4);
+  --warnbg:#3a2c0c;--acc-soft:rgba(74,222,128,.07);--acc-line:rgba(74,222,128,.34);
+  --acc-txt:#4ade80;--warn-txt:#fbbf24;--on-acc:#052e16; /* testo su fondo verde/ambra: contrasto AA */
+  --z-sticky:10;--z-nav:20;--z-modal:50;
+  --ease:cubic-bezier(.22,1,.36,1);
 }
 [data-theme="light"]{
   --bg:#f4f6f9;--card:#ffffff;--card2:#eef1f6;--txt:#1a2230;--txt2:#5b6678;
   --acc:#16a34a;--acc2:#15803d;--warn:#d97706;--bad:#dc2626;--line:#e2e7ef;
   --chip:#eef1f6;--chipon:#dcfce7;--chipontxt:#15803d;--shadow:rgba(20,30,50,.12);
+  --warnbg:#fef3c7;--acc-soft:rgba(22,163,74,.06);--acc-line:rgba(22,163,74,.32);
+  --acc-txt:#166534;--warn-txt:#92400e;--on-acc:#ffffff;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);padding-bottom:78px;transition:background .2s}
-header{position:sticky;top:0;z-index:10;background:var(--bg);padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.topbar{position:sticky;top:0;z-index:var(--z-sticky);background:var(--bg)}
+header{padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between}
 header h1{font-size:17px;font-weight:700}
-header .sub{font-size:11.5px;color:var(--txt2);margin-top:2px;text-transform:capitalize}
+header .sub{font-size:12px;color:var(--txt2);margin-top:2px}
+header .sub::first-letter,.cap::first-letter{text-transform:uppercase}
 .hbtns{display:flex;gap:8px}
-.hbtn{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.profbar{position:sticky;top:63px;z-index:9;background:var(--bg);display:flex;gap:8px;padding:8px 14px;border-bottom:1px solid var(--line);align-items:center}
-.prof{flex:1;padding:9px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt2);font-size:14px;font-weight:700;cursor:pointer}
+.hbtn{position:relative;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.hbtn::after,.switch::after{content:"";position:absolute;inset:-6px}
+.profbar{background:var(--bg);display:flex;gap:8px;padding:6px 14px 10px;border-bottom:1px solid var(--line);align-items:center}
+.prof{flex:1;min-height:44px;padding:9px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt2);font-size:14px;font-weight:700;cursor:pointer}
 .prof.on{background:var(--chipon);color:var(--chipontxt);border-color:var(--acc2)}
 .pdot{width:9px;height:9px;border-radius:50%;background:var(--txt2);flex-shrink:0}
 .pdot.on{background:var(--acc)}
@@ -39,12 +48,15 @@ main{padding:14px 14px 8px;max-width:560px;margin:0 auto}
 .mealhead h3{font-size:15px;display:flex;align-items:center;gap:7px}
 .mealhead .em{font-size:18px}
 .fixed{font-size:12.5px;color:var(--txt2);margin:6px 0 2px;line-height:1.5}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.chip{padding:7px 11px;border-radius:20px;background:var(--chip);color:var(--txt);font-size:12.5px;border:1px solid var(--line);cursor:pointer;line-height:1.2}
-.chip.on{background:var(--chipon);color:var(--chipontxt);border-color:var(--acc2);font-weight:600}
-.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);margin-top:10px;font-weight:600}
-.done-btn{padding:8px 13px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--txt2);font-size:13px;font-weight:600;cursor:pointer}
-.done-btn.on{background:var(--acc2);color:#fff;border-color:var(--acc2)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{position:relative;display:inline-flex;align-items:center;min-height:40px;padding:8px 13px;border-radius:20px;background:var(--chip);color:var(--txt);font-size:13px;border:1px solid var(--line);cursor:pointer;line-height:1.25;text-align:left;font-weight:500}
+.chip::after{content:"";position:absolute;inset:-3px}
+.chip.on{background:var(--chipon);color:var(--chipontxt);border-color:var(--acc2);box-shadow:inset 0 0 0 1px var(--acc2)}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);margin-top:12px;font-weight:700}
+.done-btn{position:relative;min-height:40px;padding:8px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--txt2);font-size:13px;font-weight:600;cursor:pointer}
+.done-btn::after{content:"";position:absolute;inset:-3px}
+.done-btn.on{background:var(--chipon);color:var(--chipontxt);border-color:var(--acc2)}
+.card.done{border-color:var(--acc-line);background:linear-gradient(var(--acc-soft),var(--acc-soft)),var(--card)}
 .toggle{display:flex;align-items:center;justify-content:space-between;padding:12px 14px}
 .switch{position:relative;width:48px;height:28px;flex-shrink:0}
 .switch input{opacity:0;width:0;height:0}
@@ -52,78 +64,115 @@ main{padding:14px 14px 8px;max-width:560px;margin:0 auto}
 .slider:before{content:"";position:absolute;height:22px;width:22px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 input:checked+.slider{background:var(--acc2);border-color:var(--acc2)}
 input:checked+.slider:before{transform:translateX(20px)}
-.sgarro-btn{width:100%;padding:12px;border-radius:14px;border:1.5px dashed var(--warn);background:transparent;color:var(--warn);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px}
-.sgarro-btn.on{background:var(--warn);color:#1a1206;border-style:solid}
-.free-note{font-size:12.5px;color:var(--acc);font-weight:600;margin-top:4px}
-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;z-index:20;padding-bottom:env(safe-area-inset-bottom)}
-nav button{flex:1;padding:10px 0 8px;background:none;border:none;color:var(--txt2);font-size:10.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:600}
+.sgarro-btn{width:100%;min-height:46px;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--txt2);font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:12px}
+.sgarro-btn.on{background:var(--warnbg);color:var(--warn-txt);border-color:var(--warn);font-weight:700}
+.free-note{font-size:13px;color:var(--acc-txt);font-weight:600;margin-top:4px}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;z-index:var(--z-nav);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;padding:10px 0 8px;background:none;border:none;color:var(--txt2);font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:600}
 nav button .i{font-size:21px}
-nav button.on{color:var(--acc)}
-.dayrow{border-bottom:1px solid var(--line);padding:11px 0}
+nav button.on{color:var(--acc-txt)}
+.dayrow{border-bottom:1px solid var(--line);padding:6px 0}
 .dayrow:last-child{border-bottom:none}
-.dayrow .dh{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-.dayrow .dh b{font-size:14.5px;text-transform:capitalize}
-.dayrow .summary{font-size:11.5px;color:var(--txt2);margin-top:3px;line-height:1.5}
+.dayrow .dh{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:56px;cursor:pointer}
+.dayrow .dh b{font-size:14.5px;text-transform:capitalize;transition:color .16s var(--ease)}
+.dayrow.open .dh b{color:var(--acc)}
+.dayrow .summary{font-size:12.5px;color:var(--txt2);margin-top:3px;line-height:1.5}
+.dayrow .chev{color:var(--txt2);font-size:15px;line-height:1;padding:0 4px}
 .dayrow .body{display:none;margin-top:8px}
 .dayrow.open .body{display:block}
-select{width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:13px;margin-top:4px;appearance:none}
+select{width:100%;min-height:44px;padding:9px 32px 9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:13px;margin-top:4px;appearance:none;cursor:pointer;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%239aa4b5' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+ background-repeat:no-repeat;background-position:right 12px center}
 .selgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.selgrid.form2{grid-template-columns:112px 1fr}
 .selgrid .full{grid-column:1/-1}
 .counts{display:flex;flex-wrap:wrap;gap:6px}
-.cnt{font-size:11.5px;padding:5px 9px;border-radius:14px;background:var(--chip);border:1px solid var(--line);color:var(--txt2)}
-.cnt.ok{color:var(--acc);border-color:var(--acc2)}
+.cnt{font-size:12px;padding:6px 10px;border-radius:14px;background:var(--chip);border:1px solid var(--line);color:var(--txt2)}
+.cnt.ok{color:var(--acc-txt);border-color:var(--acc-line)}
 .cnt.over{color:var(--bad);border-color:var(--bad);font-weight:700}
-.btn{display:block;width:100%;padding:13px;border-radius:14px;border:none;background:var(--acc2);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;margin-bottom:12px}
+.btn{display:block;width:100%;min-height:46px;padding:13px;border-radius:14px;border:none;background:var(--acc2);color:var(--on-acc);font-size:14.5px;font-weight:700;cursor:pointer;margin-bottom:12px}
 .btn.ghost{background:var(--card);color:var(--txt);border:1px solid var(--line)}
-.shopcat{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--txt2);font-weight:700;margin:14px 0 4px}
-.shopitem{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.shopcat{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--txt2);font-weight:700;margin:18px 0 2px}
+.shopcat:first-child{margin-top:2px}
+.shopcat span{font-size:11.5px;letter-spacing:0;text-transform:none;font-weight:600;opacity:.8}
+.shopitem{display:flex;align-items:center;gap:12px;min-height:48px;padding:6px 2px;border-bottom:1px solid var(--line);font-size:14.5px}
+label.shopitem,.shopitem .nm[for]{cursor:pointer}
 .shopitem:last-child{border-bottom:none}
-.shopitem input[type=checkbox]{width:21px;height:21px;accent-color:var(--acc2);flex-shrink:0}
-.shopitem.ck label{text-decoration:line-through;color:var(--txt2)}
-.shopitem .q{margin-left:auto;color:var(--txt2);font-size:12.5px;white-space:nowrap}
-.shopitem .del{background:none;border:none;color:var(--bad);font-size:16px;cursor:pointer;padding:2px 6px}
-.addrow{display:flex;gap:8px;margin-top:10px}
-.addrow input{flex:1;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:14px}
-.addrow button{padding:0 18px;border-radius:12px;border:none;background:var(--acc2);color:#fff;font-size:20px;cursor:pointer}
+.shopitem .nm{flex:1;padding:8px 0}
+.shopitem input[type=checkbox]{width:24px;height:24px;accent-color:var(--acc2);flex-shrink:0;cursor:pointer}
+.shopitem.ck .nm{text-decoration:line-through;color:var(--txt2)}
+.shopitem .q{margin-left:auto;color:var(--txt2);font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.shopitem .del,.wrow .del{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;margin:-6px -8px -6px 0;background:none;border:none;color:var(--txt2);font-size:15px;cursor:pointer;line-height:1}
+.cName,.cG{min-height:46px}
+.progline{height:6px;border-radius:6px;background:var(--chip);overflow:hidden;margin-top:8px}
+.progline i{display:block;height:100%;background:var(--acc2);border-radius:6px;transition:width .3s var(--ease)}
+.shophead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.shophead b{font-size:15px}
+.shophead span{font-size:13px;color:var(--txt2);font-variant-numeric:tabular-nums}
+.addrow{display:flex;gap:8px;margin-top:12px}
+.addrow input{flex:1;min-height:46px;padding:11px 13px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:15px}
+.addrow button{min-width:56px;padding:0 18px;border-radius:12px;border:none;background:var(--acc2);color:var(--on-acc);font-size:22px;font-weight:600;cursor:pointer}
 .stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
-.stat .v{font-size:21px;font-weight:800}
-.stat .k{font-size:10.5px;color:var(--txt2);margin-top:2px;font-weight:600}
+.stat .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.stat .k{font-size:11.5px;color:var(--txt2);margin-top:3px;font-weight:600}
 .wrow{display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--line);font-size:13.5px}
 .wrow:last-child{border-bottom:none}
 .wrow .d{color:var(--txt2)}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;overflow:auto;padding:20px 14px 40px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:var(--z-modal);overflow:auto;padding:20px 14px 40px}
 .modal.on{display:block}
 .modal .inner{background:var(--card);border-radius:18px;padding:18px;max-width:560px;margin:0 auto;font-size:13.5px;line-height:1.65}
 .modal h2{font-size:16px;margin-bottom:10px}
 .modal h4{font-size:13.5px;margin:12px 0 4px;color:var(--acc)}
 .modal .close{float:right;background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:5px 12px;cursor:pointer;font-size:13px}
 .empty{text-align:center;color:var(--txt2);font-size:13.5px;padding:26px 10px;line-height:1.6}
-svg.chart{width:100%;height:150px;display:block}
+svg.chart{width:100%;height:132px;display:block;margin-top:10px;overflow:visible}
+.chartmeta{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--txt2);margin-top:8px}
+.chartmeta span:nth-child(2){font-variant-numeric:tabular-nums}
 .weekswitch{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.weekswitch button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:16px;cursor:pointer}
-.weekswitch span{font-size:13.5px;font-weight:700}
-.minirow{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:13px}
+.weekswitch button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:17px;cursor:pointer}
+.weekswitch span{font-size:13.5px;font-weight:700;text-align:center}
+.minirow{display:flex;align-items:center;justify-content:space-between;min-height:44px;margin-top:4px;font-size:13.5px}
 .whoBtn{padding:18px;border-radius:16px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:17px;font-weight:800;cursor:pointer;width:100%;margin-top:10px}
+
+/* stati: feedback al tocco (il tap-highlight nativo e disattivato), focus da tastiera, hover su desktop */
+button,.chip,.prof,select,input[type=checkbox]{transition:background-color .16s var(--ease),border-color .16s var(--ease),color .16s var(--ease),transform .1s var(--ease),box-shadow .16s var(--ease)}
+.chip:active,.done-btn:active,.btn:active,.hbtn:active,.prof:active,.sgarro-btn:active,.whoBtn:active,.weekswitch button:active,.addrow button:active{transform:scale(.96)}
+nav button:active .i{transform:scale(.9)}
+nav button .i{transition:transform .1s var(--ease)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.shopitem input[type=checkbox]:focus-visible{outline-offset:3px}
+@media(hover:hover){
+ .chip:hover:not(.on){border-color:var(--txt2)}
+ .hbtn:hover,.weekswitch button:hover,.done-btn:hover:not(.on),.sgarro-btn:hover:not(.on){background:var(--card2);border-color:var(--txt2)}
+ .del:hover{color:var(--bad)}
+ .dayrow .dh:hover b{color:var(--acc)}
+ .shopitem label:hover{color:var(--acc)}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
+ .chip:active,.done-btn:active,.btn:active,.hbtn:active,.prof:active,.sgarro-btn:active,.whoBtn:active,.weekswitch button:active,.addrow button:active,nav button:active .i{transform:none}
+}
 </style>
 </head>
 <body data-theme="dark">
 
-<header>
-  <div>
-    <h1>🥗 Piano Alimentare</h1>
-    <div class="sub" id="hdate"></div>
+<div class="topbar">
+  <header>
+    <div>
+      <h1>🥗 Piano Alimentare</h1>
+      <div class="sub" id="hdate"></div>
+    </div>
+    <div class="hbtns">
+      <button class="hbtn" id="infoBtn" title="Piano completo" aria-label="Piano completo">📋</button>
+      <button class="hbtn" id="themeBtn" title="Cambia tema" aria-label="Cambia tema">🌙</button>
+    </div>
+  </header>
+  <div class="profbar">
+    <button class="prof" id="pGio">Giò</button>
+    <button class="prof" id="pElena">Elena</button>
+    <span class="pdot" id="pdot" title="Stato sincronizzazione"></span>
   </div>
-  <div class="hbtns">
-    <button class="hbtn" id="infoBtn" title="Piano completo">📋</button>
-    <button class="hbtn" id="themeBtn" title="Tema">🌙</button>
-  </div>
-</header>
-
-<div class="profbar">
-  <button class="prof" id="pGio">Giò</button>
-  <button class="prof" id="pElena">Elena</button>
-  <span class="pdot" id="pdot" title="Stato sincronizzazione"></span>
 </div>
 
 <main>
@@ -201,10 +250,10 @@ ceC:[
  {id:'patate',l:'Patate 300g',shop:[['Patate',300,'fru']]},
  {id:'pane',l:'Pane 100g',shop:[['Pane',100,'pan']]}],
 ceP:[
- {id:'pollo',l:'Pollo/tacchino 150g',max:3,min:2,shop:[['Pollo o tacchino',150,'car']]},
- {id:'rossa',l:'Vitello/maiale magro 150g',max:1,shop:[['Vitello o maiale (magro)',150,'car']]},
- {id:'pescem',l:'Pesce magro 200g (merluzzo…)',max:1,shop:[['Pesce magro (merluzzo/spigola/orata)',200,'pes']]},
- {id:'pesceg',l:'Pesce grasso 200g (salmone…)',max:2,min:1,shop:[['Pesce grasso (salmone/sgombro/tonno)',200,'pes']]},
+ {id:'pollo',l:'Pollo/tacchino 150g',s:'Pollo',max:3,min:2,shop:[['Pollo o tacchino',150,'car']]},
+ {id:'rossa',l:'Vitello/maiale magro 150g',s:'Carne rossa',max:1,shop:[['Vitello o maiale (magro)',150,'car']]},
+ {id:'pescem',l:'Pesce magro 200g (merluzzo…)',s:'Pesce magro',max:1,shop:[['Pesce magro (merluzzo/spigola/orata)',200,'pes']]},
+ {id:'pesceg',l:'Pesce grasso 200g (salmone…)',s:'Pesce grasso',max:2,min:1,shop:[['Pesce grasso (salmone/sgombro/tonno)',200,'pes']]},
  {id:'omelette',l:'Omelette + parmigiano 100g',shop:[['Uova',2,'uov','pz'],['Albume d\'uovo',80,'uov','ml'],['Parmigiano',100,'uov']]}],
 mePre:[
  {id:'gallette',l:'Gallette 30g + marmellata/miele 10g',shop:[['Gallette di riso',30,'pan'],['Marmellata light o miele',10,'dis']]},
@@ -330,15 +379,27 @@ function dow(ds){const d=new Date(ds+'T12:00');return (d.getDay()+6)%7}
 function day(ds){if(!S.days[ds])S.days[ds]={col:{f:null,g:null},pr:{c:null,p:null},me:null,ce:{c:null,p:null},workout:false,done:{},sgarro:false};return S.days[ds]}
 function fmtDate(ds){const d=new Date(ds+'T12:00');return d.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})}
 function lbl(list,id){const o=list.find(x=>x.id===id);return o?o.l:'—'}
+function shortLbl(list,id){const o=list.find(x=>x.id===id);return o?(o.s||o.l.split(' ')[0]):'—'}
+// id univoco per articolo della spesa: code point per code point, niente collisioni tra accenti/emoji/punteggiatura
+function shopId(n){return 's_'+Array.from(String(n)).map(c=>c.codePointAt(0)).join('-')}
 function opts(k){return O[k].concat((S.custom[k]||[]).map(c=>({id:c.id,l:c.l+(c.g?' '+c.g+'g':''),custom:true,shop:[[c.l,c.g||1,c.cat||'alt',c.g?'g':'pz']]})))}
 
 /* ============ NAV / TEMA / PROFILI ============ */
-document.body.dataset.theme=U.theme;
 const themeBtn=document.getElementById('themeBtn');
-themeBtn.textContent=U.theme==='dark'?'🌙':'☀️';
-themeBtn.onclick=()=>{U.theme=U.theme==='dark'?'light':'dark';document.body.dataset.theme=U.theme;themeBtn.textContent=U.theme==='dark'?'🌙':'☀️';saveU()};
-document.getElementById('infoBtn').onclick=()=>document.getElementById('planModal').classList.add('on');
-document.getElementById('planClose').onclick=()=>document.getElementById('planModal').classList.remove('on');
+function applyTheme(){
+ document.body.dataset.theme=U.theme;
+ themeBtn.textContent=U.theme==='dark'?'🌙':'☀️';
+ const m=document.querySelector('meta[name="theme-color"]');
+ if(m)m.content=U.theme==='dark'?'#0f1218':'#f4f6f9'; // barra di stato del telefono in tinta
+}
+applyTheme();
+themeBtn.onclick=()=>{U.theme=U.theme==='dark'?'light':'dark';applyTheme();saveU()};
+const planModal=document.getElementById('planModal');
+function setPlan(on){planModal.classList.toggle('on',on);document.body.style.overflow=on?'hidden':''}
+document.getElementById('infoBtn').onclick=()=>setPlan(true);
+document.getElementById('planClose').onclick=()=>setPlan(false);
+planModal.onclick=e=>{if(e.target===planModal)setPlan(false)}; // tocco fuori dal riquadro
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setPlan(false)});
 function joinAs(p){
  const err=document.getElementById('whoErr');
  const code=U.secret||document.getElementById('whoCode').value.trim();
@@ -370,7 +431,7 @@ function countsHtml(dates){
  const c=cenaCounts(dates);
  return '<div class="counts">'+O.ceP.filter(p=>p.max).map(p=>{
   const n=c[p.id]||0;const cls=n>p.max?'over':(n>=(p.min||1)?'ok':'');
-  return `<span class="cnt ${cls}">${p.l.split(' ')[0]} ${n}/${p.max}${n>p.max?' ⚠️':''}</span>`;
+  return `<span class="cnt ${cls}">${p.s||p.l.split(' ')[0]} ${n}/${p.max}${n>p.max?' ⚠️':''}</span>`;
  }).join('')+'</div>';
 }
 
@@ -384,9 +445,8 @@ function renderOggi(){
  let h='';
  h+=`<div class="card toggle"><div><b style="font-size:14.5px">🏋️ Oggi mi alleno</b><div class="fixed">Cambia la merenda consigliata</div></div>
  <label class="switch"><input type="checkbox" id="wk" ${d.workout?'checked':''}><span class="slider"></span></label></div>`;
- h+=`<button class="sgarro-btn ${d.sgarro?'on':''}" id="sg">${d.sgarro?'😅 Sgarro segnato oggi':'🍕 Segna giorno di sgarro'}</button>`;
 
- const meal=(key,emoji,title,inner,freeNote)=>`<div class="card" data-m="${key}">
+ const meal=(key,emoji,title,inner,freeNote)=>`<div class="card ${d.done[key]?'done':''}" data-m="${key}">
   <div class="mealhead"><h3><span class="em">${emoji}</span>${title}</h3>
   <button class="done-btn ${d.done[key]?'on':''}" data-done="${key}">${d.done[key]?'✓ Fatto':'Da fare'}</button></div>
   ${freeNote?`<div class="free-note">${freeNote}</div>`:''}${inner}</div>`;
@@ -408,12 +468,14 @@ function renderOggi(){
   :`<div class="fixed"><b>${O.meNo.l}</b></div>`);
 
  h+=meal('ce','🍽️','Cena',
-  satCena?'<div class="fixed">Stasera pizza o cena libera 🍕</div>':
+  satCena?`<div class="lbl">Frequenze cena questa settimana</div>${countsHtml(weekDates(0))}`:
   `<div class="lbl">Carboidrato</div>${chips(opts('ceC'),d.ce.c)}
    <div class="lbl">Proteina</div>${chips(opts('ceP'),d.ce.p)}
    <div class="fixed">+ verdure a scelta + 10g olio EVO</div>
    <div class="lbl">Frequenze cena questa settimana</div>${countsHtml(weekDates(0))}`,
-  satCena?'🍕 Cena libera del sabato':null);
+  satCena?'🍕 Stasera pizza o cena libera':null);
+
+ h+=`<button class="sgarro-btn ${d.sgarro?'on':''}" id="sg">${d.sgarro?'😅 Sgarro segnato oggi · annulla':'🍕 Segna giorno di sgarro'}</button>`;
 
  v.innerHTML=h;
  v.querySelector('#wk').onchange=e=>{d.workout=e.target.checked;save();renderOggi()};
@@ -436,13 +498,13 @@ function customCardHtml(){
  let h=`<div class="card"><div class="mealhead" style="margin-bottom:4px"><h3><span class="em">➕</span>Alimenti personalizzati</h3></div>
  <div class="fixed">Nome + grammi + pasto + reparto: l'alimento comparirà tra le scelte di Oggi e Settimana e nella lista spesa.</div>`;
  const allC=[];Object.keys(SLOTS).forEach(k=>(S.custom[k]||[]).forEach(c=>allC.push([k,c])));
- allC.forEach(([k,c])=>{h+=`<div class="shopitem"><label>${esc(c.l)}${c.g?' '+esc(c.g)+'g':''}</label><span class="q">${SLOTS[k]}</span><button class="del" data-cdel="${esc(k+'|'+c.id)}">✕</button></div>`});
- h+=`<div class="lbl">Nuovo alimento</div><div class="selgrid">
+ allC.forEach(([k,c])=>{h+=`<div class="shopitem"><span class="nm">${esc(c.l)}${c.g?' '+esc(c.g)+'g':''}</span><span class="q">${SLOTS[k]}</span><button class="del" data-cdel="${esc(k+'|'+c.id)}" aria-label="Elimina">✕</button></div>`});
+ h+=`<div class="lbl">Nuovo alimento</div><div class="selgrid form2">
   <input class="cName full" placeholder="Nome (es. seitan, ricotta, couscous…)" style="padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:13px">
   <input class="cG" type="number" inputmode="numeric" placeholder="Grammi" style="padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:13px">
   <select class="cSlot" style="margin-top:0">${Object.entries(SLOTS).map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select>
   <select class="cCat full" style="margin-top:0">${Object.entries(CAT).map(([k,l])=>`<option value="${k}" ${k==='alt'?'selected':''}>Reparto: ${l}</option>`).join('')}</select>
-  <button class="btn full cAdd" style="margin:2px 0 0">Aggiungi alimento</button>
+  <button class="btn ghost full cAdd" style="margin:2px 0 0">Aggiungi alimento</button>
  </div></div>`;
  return h;
 }
@@ -472,13 +534,13 @@ function renderSett(){
   const d=day(ds),sat=i===5,sun_=i===6,isToday=ds===today();
   const sel=(list,val,k1,k2)=>`<select data-ds="${ds}" data-k="${k1}.${k2}"><option value="">— ${k2==='c'?'carboidrato':k2==='p'?'proteina':k2==='f'?'proteina colazione':'grassi'} —</option>${list.map(o=>`<option value="${esc(o.id)}" ${val===o.id?'selected':''}>${esc(o.l)}</option>`).join('')}</select>`;
   const sum=[];
-  if(d.pr.p&&!sun_)sum.push('P: '+esc(lbl(opts('prP'),d.pr.p).split(' ')[0]));
-  if(sun_)sum.push('P: libero 🎉');
-  if(sat)sum.push('C: pizza 🍕');else if(d.ce.p)sum.push('C: '+esc(lbl(opts('ceP'),d.ce.p).split(' ')[0]));
-  if(d.workout)sum.push('🏋️');
+  if(d.pr.p&&!sun_)sum.push('🍝 '+esc(shortLbl(opts('prP'),d.pr.p)));
+  if(sun_)sum.push('🍝 libero');
+  if(sat)sum.push('🍽️ pizza');else if(d.ce.p)sum.push('🍽️ '+esc(shortLbl(opts('ceP'),d.ce.p)));
+  if(d.workout)sum.push('🏋️ workout');
   if(d.sgarro)sum.push('😅 sgarro');
   h+=`<div class="dayrow ${openDay===ds?'open':''}" data-day="${ds}">
-   <div class="dh" data-toggle="${ds}"><div><b>${DAYS[i]}${isToday?' · oggi':''}</b><div class="summary">${sum.join(' · ')||'Da pianificare'}</div></div><span>${openDay===ds?'▲':'▼'}</span></div>
+   <div class="dh" data-toggle="${ds}"><div><b>${DAYS[i]}${isToday?' · oggi':''}</b><div class="summary">${sum.join(' · ')||'Da pianificare'}</div></div><span class="chev">${openDay===ds?'▴':'▾'}</span></div>
    <div class="body">
     <div class="lbl">Colazione</div><div class="selgrid">${sel(opts('colF'),d.col.f,'col','f')}${sel(opts('colG'),d.col.g,'col','g')}</div>
     ${sun_?'<div class="lbl">Pranzo</div><div class="fixed">🎉 Libero con moderazione</div>':`<div class="lbl">Pranzo</div><div class="selgrid">${sel(opts('prC'),d.pr.c,'pr','c')}${sel(opts('prP'),d.pr.p,'pr','p')}</div>`}
@@ -529,30 +591,35 @@ function renderSpesa(){
  const wk='w'+iso(monday(U.weekOff||0));
  if(!S.shop[wk])S.shop[wk]={};
  const ck=S.shop[wk];
- let h=`<button class="btn ghost" id="clearCk">↺ Azzera spunte settimana</button>`;
+ let h='';
  const planned=items.some(i=>!['Pane integrale','Frutta fresca','Verdure di stagione','Mandorle'].includes(i.n));
  if(!planned)h+='<div class="card"><div class="empty">Pianifica i pasti nella tab <b>Settimana</b> per generare la lista completa con le quantità 🛒</div></div>';
  const byCat={};items.forEach(i=>{(byCat[i.cat]=byCat[i.cat]||[]).push(i)});
+ const presi=items.filter(i=>ck[shopId(i.n)]).length;
  h+='<div class="card">';
+ h+=`<div class="shophead"><b>Lista della settimana</b><span>${presi} di ${items.length} presi</span></div>
+  <div class="progline"><i style="width:${items.length?Math.round(presi/items.length*100):0}%"></i></div>`;
  Object.keys(CAT).forEach(c=>{
   if(!byCat[c])return;
-  h+=`<div class="shopcat">${CAT[c]}</div>`;
+  const fatti=byCat[c].filter(i=>ck[shopId(i.n)]).length;
+  h+=`<div class="shopcat">${CAT[c]}<span>${fatti}/${byCat[c].length}</span></div>`;
   byCat[c].forEach(i=>{
-   const id='s_'+Array.from(String(i.n)).map(c=>c.codePointAt(0)).join('-');
+   const id=shopId(i.n);
    const q=i.u==='pz'?i.q+' pz':i.u==='porz.'?i.q+' porz.':i.u==='ml'?i.q+' ml':i.q+' g';
-   h+=`<div class="shopitem ${ck[id]?'ck':''}"><input type="checkbox" id="${id}" data-ck="${id}" ${ck[id]?'checked':''}><label for="${id}">${esc(i.n)}</label><span class="q">${esc(q)}</span></div>`;
+   h+=`<label class="shopitem ${ck[id]?'ck':''}"><input type="checkbox" id="${id}" data-ck="${id}" ${ck[id]?'checked':''}><span class="nm">${esc(i.n)}</span><span class="q">${esc(q)}</span></label>`;
   });
  });
  h+='</div>';
+ if(presi)h+=`<button class="btn ghost" id="clearCk">↺ Azzera le spunte</button>`;
  h+=customCardHtml();
- h+='<div class="card"><div class="lbl" style="margin-top:0">Aggiunte manuali (non alimenti: caffè, acqua, casa…)</div>';
- if(!S.shopExtra.length)h+='<div class="fixed">Niente di extra. Aggiungi sotto 👇</div>';
+ h+='<div class="card"><div class="mealhead" style="margin-bottom:4px"><h3><span class="em">🧺</span>Aggiunte manuali</h3></div><div class="fixed">Tutto ciò che non è nel piano: caffè, acqua, prodotti per la casa.</div>';
+ if(!S.shopExtra.length)h+='<div class="fixed" style="margin-top:8px">Niente di extra per ora.</div>';
  S.shopExtra.forEach((e,i)=>{
-  h+=`<div class="shopitem ${e.ck?'ck':''}"><input type="checkbox" data-ex="${i}" ${e.ck?'checked':''}><label>${esc(e.n)}</label><button class="del" data-del="${i}">✕</button></div>`;
+  h+=`<div class="shopitem ${e.ck?'ck':''}"><input type="checkbox" id="ex${i}" data-ex="${i}" ${e.ck?'checked':''}><label class="nm" for="ex${i}">${esc(e.n)}</label><button class="del" data-del="${i}" aria-label="Elimina">✕</button></div>`;
  });
  h+=`<div class="addrow"><input id="exName" placeholder="Es. caffè, acqua, detersivo…"><button id="exAdd">+</button></div></div>`;
  v.innerHTML=h;
- v.querySelector('#clearCk').onclick=()=>{S.shop[wk]={};save();renderSpesa()};
+ const clr=v.querySelector('#clearCk');if(clr)clr.onclick=()=>{S.shop[wk]={};save();renderSpesa()};
  bindCustomCard(v,renderSpesa);
  v.querySelectorAll('[data-ck]').forEach(c=>c.onchange=()=>{ck[c.dataset.ck]=c.checked;save();renderSpesa()});
  v.querySelectorAll('[data-ex]').forEach(c=>c.onchange=()=>{S.shopExtra[c.dataset.ex].ck=c.checked;save();renderSpesa()});
@@ -583,17 +650,17 @@ function renderProg(){
   <div class="stat"><div class="v" style="color:${sgMese>5?'var(--bad)':'var(--txt)'}">${sgMese}</div><div class="k">Sgarri mese</div></div>
  </div>`;
 
- h+=`<div class="card"><div class="mealhead"><h3><span class="em">⚖️</span>Peso di ${PROFILES[U.profile]||''}</h3>${last?`<b>${esc(last)} kg${delta?` <span style="font-size:12px;color:${delta<=0?'var(--acc)':'var(--warn)'}">(${delta>0?'+':''}${esc(delta)})</span>`:''}</b>`:''}</div>`;
+ h+=`<div class="card"><div class="mealhead"><h3><span class="em">⚖️</span>Peso di ${PROFILES[U.profile]||''}</h3>${last?`<b>${esc(last)} kg${delta?` <span style="font-size:12.5px;color:${delta<=0?'var(--acc-txt)':'var(--warn-txt)'}">(${delta>0?'+':''}${esc(delta)})</span>`:''}</b>`:''}</div>`;
  if(ws.length>1)h+=chart(ws);
  h+=`<div class="addrow"><input id="wkg" type="number" inputmode="decimal" step="0.1" placeholder="Peso di oggi (kg)"><button id="wadd">+</button></div>`;
  if(ws.length){h+='<div style="margin-top:10px">';
-  [...ws].reverse().slice(0,8).forEach(w=>{h+=`<div class="wrow"><span class="d">${new Date(w.d+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</span><span><b>${esc(w.kg)} kg</b> <button class="del" data-wdel="${esc(w.d)}" style="background:none;border:none;color:var(--bad);cursor:pointer">✕</button></span></div>`});
+  [...ws].reverse().slice(0,8).forEach(w=>{h+=`<div class="wrow"><span class="d">${new Date(w.d+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</span><span><b>${esc(w.kg)} kg</b> <button class="del" data-wdel="${esc(w.d)}" aria-label="Elimina">✕</button></span></div>`});
   h+='</div>'}
  h+='</div>';
 
  const sg=Object.keys(S.days).filter(ds=>S.days[ds].sgarro).sort().reverse().slice(0,10);
  h+=`<div class="card"><div class="mealhead"><h3><span class="em">😅</span>Ultimi sgarri</h3></div>`;
- h+=sg.length?sg.map(ds=>`<div class="wrow"><span class="d" style="text-transform:capitalize">${fmtDate(ds)}</span><span>🍕</span></div>`).join(''):'<div class="fixed">Nessuno sgarro registrato. Grande! 💪</div>';
+ h+=sg.length?sg.map(ds=>`<div class="wrow"><span class="d cap">${fmtDate(ds)}</span><span>🍕</span></div>`).join(''):'<div class="fixed">Nessuno sgarro registrato. Grande! 💪</div>';
  h+='</div>';
 
  v.innerHTML=h;
@@ -606,19 +673,26 @@ function renderProg(){
  v.querySelectorAll('[data-wdel]').forEach(b=>b.onclick=()=>{S.weights=S.weights.filter(w=>w.d!==b.dataset.wdel);save();renderProg()});
 }
 function chart(ws){
- const data=ws.slice(-14),W=320,H=140,P=24;
- const kgs=data.map(w=>w.kg);
+ const data=ws.slice(-14),W=320,H=132,PL=6,PR=6,PT=14,PB=12;
+ const kgs=data.map(w=>+w.kg||0);
  const min=Math.min.apply(null,kgs),max=Math.max.apply(null,kgs);
  const sp=Math.max(max-min,1);
- const x=i=>P+i*(W-2*P)/Math.max(data.length-1,1);
- const y=k=>H-P-((k-min)/sp)*(H-2*P);
- const pts=data.map((w,i)=>x(i)+','+y(w.kg)).join(' ');
- return `<svg class="chart" viewBox="0 0 ${W} ${H}">
-  <polyline points="${pts}" fill="none" stroke="var(--acc)" stroke-width="2.5" stroke-linejoin="round"/>
-  ${data.map((w,i)=>`<circle cx="${x(i)}" cy="${y(w.kg)}" r="3.5" fill="var(--acc)"/>`).join('')}
-  <text x="${P}" y="12" font-size="10" fill="var(--txt2)">${max} kg</text>
-  <text x="${P}" y="${H-6}" font-size="10" fill="var(--txt2)">${min} kg</text>
- </svg>`;
+ const x=i=>PL+i*(W-PL-PR)/Math.max(data.length-1,1);
+ const y=k=>H-PB-((k-min)/sp)*(H-PT-PB);
+ const pts=data.map((w,i)=>x(i)+','+y(+w.kg||0)).join(' ');
+ const li=data.length-1;
+ const dt=s=>new Date(s+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+ return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Andamento del peso, da ${kgs[0]} a ${kgs[li]} kg">
+  <defs><linearGradient id="wgrad" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0" stop-color="var(--acc)" stop-opacity=".26"/><stop offset="1" stop-color="var(--acc)" stop-opacity="0"/></linearGradient></defs>
+  <line x1="${PL}" y1="${y(max)}" x2="${W-PR}" y2="${y(max)}" stroke="var(--line)"/>
+  <line x1="${PL}" y1="${y(min)}" x2="${W-PR}" y2="${y(min)}" stroke="var(--line)"/>
+  <polygon points="${PL},${H-PB} ${pts} ${W-PR},${H-PB}" fill="url(#wgrad)"/>
+  <polyline points="${pts}" fill="none" stroke="var(--acc)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  ${data.map((w,i)=>`<circle cx="${x(i)}" cy="${y(+w.kg||0)}" r="${i===li?4:2.6}" fill="var(--acc)"/>`).join('')}
+  <circle cx="${x(li)}" cy="${y(kgs[li])}" r="8" fill="var(--acc)" opacity=".16"/>
+ </svg>
+ <div class="chartmeta"><span>${dt(data[0].d)}</span><span>min ${min} · max ${max} kg</span><span>${dt(data[li].d)}</span></div>`;
 }
 
 /* ============ AVVIO ============ */
