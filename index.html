@@ -442,17 +442,32 @@ function joinAs(p){
  if(!code){err.textContent='Inserisci il codice famiglia';err.style.display='block';return}
  const remEl=document.getElementById('whoRemember');
  const rem=remEl?remEl.checked:true;
- if(!DB){U.secret=code;U.rememberCode=rem;saveU();setProfile(p);return}
- err.style.display='none';
+ const entra=()=>{U.secret=code;U.rememberCode=rem;saveU();setProfile(p)};
+ // Senza SDK o senza rete si entra lo stesso: i dati stanno in locale e si sincronizzano dopo.
+ // Il service worker tiene l'SDK in cache, quindi DB esiste anche offline e once() resterebbe
+ // appeso all'infinito: da qui il timeout, altrimenti il pulsante sembra non funzionare.
+ if(!DB||navigator.onLine===false){entra();return}
+ attesaCodice(true);
+ let finito=false;
+ const chiudi=()=>{if(finito)return true;finito=true;clearTimeout(scaduto);attesaCodice(false);return false};
+ const scaduto=setTimeout(()=>{if(finito)return;finito=true;attesaCodice(false);entra()},6000);
  DB.ref('piano_'+code+'/_check').once('value')
-  .then(()=>{failSet({n:0,until:0,mail:f.mail});U.secret=code;U.rememberCode=rem;saveU();setProfile(p)})
+  .then(()=>{if(chiudi())return;failSet({n:0,until:0,mail:f.mail});entra()})
   .catch(()=>{
+   if(chiudi())return;
    const n=f.n+1,att=failAttesa(n);
    failSet({n:n,until:att?Date.now()+att*1000:0,mail:f.mail});
    avvisaMail(n);
    if(att)mostraBlocco();
    else{err.textContent='Codice errato, riprova.';err.style.display='block'}
   });
+}
+// mentre controlla il codice: i pulsanti non rispondono, quindi va detto
+function attesaCodice(on){
+ const err=document.getElementById('whoErr');
+ [document.getElementById('whoGio'),document.getElementById('whoElena')].forEach(b=>{b.disabled=on;b.style.opacity=on?'.45':''});
+ if(on){err.textContent='Verifico il codice…';err.style.color='var(--txt2)';err.style.display='block'}
+ else{err.style.color='';err.textContent='';err.style.display='none'}
 }
 document.getElementById('pGio').onclick=()=>{if(U.secret)setProfile('gio')};
 document.getElementById('pElena').onclick=()=>{if(U.secret)setProfile('elena')};
