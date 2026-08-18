@@ -443,14 +443,21 @@ function joinAs(p){
  const remEl=document.getElementById('whoRemember');
  const rem=remEl?remEl.checked:true;
  const entra=()=>{U.secret=code;U.rememberCode=rem;saveU();setProfile(p)};
- // Senza SDK o senza rete si entra lo stesso: i dati stanno in locale e si sincronizzano dopo.
- // Il service worker tiene l'SDK in cache, quindi DB esiste anche offline e once() resterebbe
- // appeso all'infinito: da qui il timeout, altrimenti il pulsante sembra non funzionare.
- if(!DB||navigator.onLine===false){entra();return}
+ // Un codice non verificato NON entra: senza server non si puo sapere se e giusto, e accettarlo
+ // significherebbe salvare sul telefono un codice magari morto, che poi non sincronizza mai.
+ // I telefoni gia configurati non passano di qui: all'avvio entrano con U.secret gia salvato,
+ // quindi restano pienamente usabili anche offline.
+ // Il service worker tiene l'SDK in cache, quindi offline DB esiste e once() resterebbe appesa
+ // all'infinito: da qui il timeout, altrimenti il pulsante sembra non funzionare.
+ const nonVerificabile=()=>{
+  err.textContent='Non riesco a raggiungere il server: il primo accesso richiede la connessione. Controlla la rete e riprova.';
+  err.style.display='block';
+ };
+ if(!DB||navigator.onLine===false){nonVerificabile();return}
  attesaCodice(true);
  let finito=false;
  const chiudi=()=>{if(finito)return true;finito=true;clearTimeout(scaduto);attesaCodice(false);return false};
- const scaduto=setTimeout(()=>{if(finito)return;finito=true;attesaCodice(false);entra()},6000);
+ const scaduto=setTimeout(()=>{if(finito)return;finito=true;attesaCodice(false);nonVerificabile()},6000);
  DB.ref('piano_'+code+'/_check').once('value')
   .then(()=>{if(chiudi())return;failSet({n:0,until:0,mail:f.mail});entra()})
   .catch(()=>{
